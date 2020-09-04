@@ -1,0 +1,100 @@
+package logx
+
+import (
+	nested "github.com/antonfisher/nested-logrus-formatter"
+	log "github.com/sirupsen/logrus"
+)
+
+var formatter = &nested.Formatter{
+	HideKeys:        true,
+	FieldsOrder:     []string{"component", "category"},
+	TimestampFormat: "2006-01-02 15:04:05",
+}
+
+//Logger custom logger
+type Logger struct {
+	*log.Logger
+}
+
+//Entry log entry
+type Entry struct {
+	// *Logger
+	*log.Entry
+}
+
+type Config interface {
+	Level() int
+	ReportCaller() bool
+	NoColors() bool
+	CallerFirst() bool
+}
+
+var config Config
+
+//SetConfig set config
+func SetConfig(cfg Config) {
+	config = cfg
+}
+
+//New new logger
+func New() *Logger {
+	nLog := log.New()
+	lg := &Logger{
+		Logger: nLog,
+	}
+	if config != nil {
+		level := log.Level(config.Level())
+		if level >= log.DebugLevel {
+			formatter.HideKeys = false
+		}
+		nLog.SetLevel(level)
+		nLog.SetReportCaller(config.ReportCaller())
+		formatter.NoColors = config.NoColors()
+		if config.ReportCaller() {
+			formatter.CallerFirst = config.CallerFirst()
+		}
+	}
+
+	nLog.SetFormatter(formatter)
+	return lg
+}
+
+const (
+	fieldSvcKey = "service"
+	fieldComKey = "component"
+	fieldCatKey = "category"
+)
+
+//Service setting svc name
+func (l *Logger) Service(svc string) *Entry {
+	return &Entry{l.WithField(fieldSvcKey, svc)}
+}
+
+//Component setting svc name
+func (l *Logger) Component(com string) *Entry {
+	return &Entry{l.WithField(fieldComKey, com)}
+}
+
+//Category setting svc name
+func (l *Logger) Category(name string) *Entry {
+	return &Entry{l.WithField(fieldCatKey, name)}
+}
+
+//Component setting svc name
+func (e *Entry) Component(com string) *Entry {
+	return &Entry{e.WithField(fieldComKey, com)}
+}
+
+//Category setting svc name
+func (e *Entry) Category(name string) *Entry {
+	return &Entry{e.WithField(fieldCatKey, name)}
+}
+
+var defaultLogger = &Logger{
+	log.StandardLogger(),
+}
+
+//StdLogger std logger
+func StdLogger() *Logger {
+	return defaultLogger
+}
