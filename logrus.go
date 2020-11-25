@@ -61,6 +61,7 @@ func New() *Logger {
 		if len(config.FieldsOrder()) > 0 {
 			formatter.FieldsOrder = config.FieldsOrder()
 		}
+		formatter.NoUppercaseLevel = config.NoUppercaseLevel()
 	}
 
 	nLog.SetFormatter(formatter)
