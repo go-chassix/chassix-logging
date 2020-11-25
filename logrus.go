@@ -7,7 +7,7 @@ import (
 
 var formatter = &nested.Formatter{
 	HideKeys:        true,
-	FieldsOrder:     []string{"component", "category"},
+	FieldsOrder:     []string{"category", "component"},
 	TimestampFormat: "2006-01-02 15:04:05",
 }
 
@@ -27,6 +27,8 @@ type Config interface {
 	ReportCaller() bool
 	NoColors() bool
 	CallerFirst() bool
+	HideKeys() bool
+	FieldsOrder() []string
 }
 
 var config Config
@@ -49,7 +51,9 @@ func New() *Logger {
 		}
 		nLog.SetLevel(level)
 		nLog.SetReportCaller(config.ReportCaller())
+
 		formatter.NoColors = config.NoColors()
+		formatter.HideKeys = config.HideKeys()
 		if config.ReportCaller() {
 			formatter.CallerFirst = config.CallerFirst()
 		}
