@@ -57,6 +57,9 @@ func New() *Logger {
 		if config.ReportCaller() {
 			formatter.CallerFirst = config.CallerFirst()
 		}
+		if len(config.FieldsOrder()) > 0 {
+			formatter.FieldsOrder = config.FieldsOrder()
+		}
 	}
 
 	nLog.SetFormatter(formatter)
