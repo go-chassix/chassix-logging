@@ -29,6 +29,7 @@ type Config interface {
 	CallerFirst() bool
 	HideKeys() bool
 	FieldsOrder() []string
+	NoUppercaseLevel() bool
 }
 
 var config Config
